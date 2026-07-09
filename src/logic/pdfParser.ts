@@ -1,4 +1,5 @@
 import type { ExtractedData } from "../types/domain";
+import pdfWorkerSrc from "pdfjs-dist/legacy/build/pdf.worker.mjs?url";
 
 const yen = "([0-9０-９,，]+)\\s*円";
 const normalizeDigits = (value: string) =>
@@ -24,8 +25,9 @@ const findText = (text: string, patterns: RegExp[]) => {
 
 export async function parseAuctionPdf(file: File): Promise<ExtractedData> {
   const pdfjs = (await import("pdfjs-dist/legacy/build/pdf.mjs")) as any;
+  pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
   const data = new Uint8Array(await file.arrayBuffer());
-  const loadingTask = pdfjs.getDocument({ data, disableWorker: true });
+  const loadingTask = pdfjs.getDocument({ data });
   const pdf = await loadingTask.promise;
   const chunks: string[] = [];
   for (let pageNumber = 1; pageNumber <= Math.min(pdf.numPages, 30); pageNumber += 1) {

@@ -79,6 +79,8 @@ export function App() {
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [active, setActive] = useState("取込");
   const [importPreview, setImportPreview] = useState<Record<string, unknown>[]>([]);
+  const [pdfStatus, setPdfStatus] = useState<"idle" | "reading" | "done" | "error">("idle");
+  const [pdfMessage, setPdfMessage] = useState("");
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setProjects(loadProjects()), []);
@@ -100,22 +102,31 @@ export function App() {
 
   async function handlePdf(file?: File) {
     if (!file) return;
-    const extracted = await parseAuctionPdf(file);
-    setProject((current) => {
-      const next = { ...current, extracted };
-      const basic = { ...current.basic };
-      Object.entries(extracted.basic).forEach(([key, value]) => {
-        if (value === undefined) return;
-        const currentValue = (basic as any)[key];
-        (basic as any)[key] = { value, source: "pdf" };
-        if (!current.costs.bidPrice && key === "minimumPurchasePrice") next.costs = { ...next.costs, bidPrice: Number(value) || 0 };
+    setPdfStatus("reading");
+    setPdfMessage(`${file.name} を読み取っています...`);
+    try {
+      const extracted = await parseAuctionPdf(file);
+      setProject((current) => {
+        const next = { ...current, extracted };
+        const basic = { ...current.basic };
+        Object.entries(extracted.basic).forEach(([key, value]) => {
+          if (value === undefined) return;
+          (basic as any)[key] = { value, source: "pdf" };
+          if (!current.costs.bidPrice && key === "minimumPurchasePrice") next.costs = { ...next.costs, bidPrice: Number(value) || 0 };
+        });
+        next.basic = basic;
+        if (basic.saleBasePrice.value && !next.costs.bidPrice) next.costs = { ...next.costs, bidPrice: basic.saleBasePrice.value };
+        next.name = basic.address.value || file.name.replace(/\.pdf$/i, "");
+        return next;
       });
-      next.basic = basic;
-      if (basic.saleBasePrice.value && !next.costs.bidPrice) next.costs = { ...next.costs, bidPrice: basic.saleBasePrice.value };
-      next.name = basic.address.value || file.name.replace(/\.pdf$/i, "");
-      return next;
-    });
-    setActive("基本情報");
+      setPdfStatus("done");
+      setPdfMessage("PDFの読み取りが完了しました。抽出候補を確認してください。");
+      setActive("基本情報");
+    } catch (error) {
+      console.error(error);
+      setPdfStatus("error");
+      setPdfMessage("PDFを読み取れませんでした。暗号化PDF、画像PDF、または未対応形式の可能性があります。主要項目は手入力できます。");
+    }
   }
 
   function autoFillCosts() {
@@ -291,8 +302,16 @@ export function App() {
               <Upload size={34} />
               <strong>3点セットPDFを選択</strong>
               <span>地方裁判所、事件番号、価額などを候補抽出します</span>
-              <input type="file" accept="application/pdf" onChange={(event) => handlePdf(event.target.files?.[0])} />
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(event) => {
+                  handlePdf(event.target.files?.[0]);
+                  event.currentTarget.value = "";
+                }}
+              />
             </label>
+            {pdfMessage && <p className={pdfStatus === "error" ? "warning" : "notice"}>{pdfMessage}</p>}
             {project.extracted && (
               <div className="extracted">
                 <h2>抽出メモ</h2>
