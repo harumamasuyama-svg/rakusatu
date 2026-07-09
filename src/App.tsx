@@ -11,6 +11,7 @@ import { loadProjects, saveProject } from "./storage/localStore";
 import type { EditableNumber, EditableText, ProjectData, RentCase } from "./types/domain";
 
 const yen = new Intl.NumberFormat("ja-JP");
+const logoSrc = `${import.meta.env.BASE_URL}logo.png`;
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
 const money = (v: number) => `${yen.format(Math.round(v))}円`;
 const man = (v: number) => `${yen.format(Math.round(v / 10000))}万円`;
@@ -64,7 +65,7 @@ function Splash({ done }: { done: () => void }) {
   return (
     <div className="splash">
       <div className="splashInner">
-        <img src="/logo.png" alt="ラクサツ！" />
+        <img src={logoSrc} alt="ラクサツ！" />
         <h1>ラクサツ！</h1>
         <p>競売不動産 入札価格シミュレーション</p>
       </div>
@@ -226,7 +227,7 @@ export function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <img src="/logo.png" alt="ラクサツ！" />
+          <img src={logoSrc} alt="ラクサツ！" />
           <strong>ラクサツ！</strong>
         </div>
         <div className="screenName">{active}</div>
@@ -282,7 +283,7 @@ export function App() {
         {active === "取込" && (
           <section className="panel uploadPanel">
             <div>
-              <img src="/logo.png" alt="ラクサツ！" className="homeLogo" />
+              <img src={logoSrc} alt="ラクサツ！" className="homeLogo" />
               <h1>3点セットPDFから入札判断を開始</h1>
               <p>抽出できた候補値を表示し、未抽出項目は要確認として手入力できます。外部サイトからの自動取得や無断スクレイピングは行いません。</p>
             </div>
@@ -489,7 +490,7 @@ export function App() {
 function Report({ refEl, project, result }: { refEl: React.RefObject<HTMLDivElement | null>; project: ProjectData; result: ReturnType<typeof calculateProject> }) {
   return (
     <div className="a4" ref={refEl}>
-      <header><img src="/logo.png" alt="ラクサツ！" /><div><h1>ラクサツ！ 投資判断レポート</h1><p>作成日 {new Date().toLocaleDateString("ja-JP")}</p></div><strong className={`grade grade${result.grade}`}>{result.grade}</strong></header>
+      <header><img src={logoSrc} alt="ラクサツ！" /><div><h1>ラクサツ！ 投資判断レポート</h1><p>作成日 {new Date().toLocaleDateString("ja-JP")}</p></div><strong className={`grade grade${result.grade}`}>{result.grade}</strong></header>
       <div className="reportGrid">
         <b>地方裁判所</b><span>{project.basic.court.value}</span><b>支部</b><span>{project.basic.branch.value}</span>
         <b>事件番号</b><span>{project.basic.caseNumber.value}</span><b>物件番号</b><span>{project.basic.propertyNumber.value}</span>

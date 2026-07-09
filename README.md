@@ -37,6 +37,25 @@ pnpm build
 
 生成物は `dist/` に出力されます。通常利用は `file://` で直接 `index.html` を開くのではなく、ローカルサーバー経由で開いてください。
 
+## GitHub Pages
+
+このリポジトリ名は `rakusatu` を想定しているため、Viteの `base` は `/rakusatu/` に設定しています。
+
+GitHub Pagesで公開する場合は、GitHubのリポジトリ設定で次を選びます。
+
+- Settings
+- Pages
+- Build and deployment
+- Source: GitHub Actions
+
+`main` ブランチへpushすると、`.github/workflows/deploy.yml` が自動でビルドと公開を行います。
+
+公開URL:
+
+```text
+https://harumamasuyama-svg.github.io/rakusatu/
+```
+
 ## GitHubにアップロードするファイル
 
 主に以下をアップロードします。
