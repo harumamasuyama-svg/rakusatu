@@ -1,0 +1,23 @@
+{
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "html2canvas": "latest",
+    "jspdf": "latest",
+    "lucide-react": "latest",
+    "papaparse": "latest",
+    "pdfjs-dist": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "xlsx": "latest"
+  },
+  "devDependencies": {}
+}
