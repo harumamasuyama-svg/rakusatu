@@ -105,7 +105,7 @@ export function App() {
     setPdfStatus("reading");
     setPdfMessage(`${file.name} を読み取っています...`);
     try {
-      const extracted = await parseAuctionPdf(file);
+      const extracted = await parseAuctionPdf(file, setPdfMessage);
       setProject((current) => {
         const next = { ...current, extracted };
         const basic = { ...current.basic };
@@ -120,8 +120,16 @@ export function App() {
         return next;
       });
       setPdfStatus("done");
-      setPdfMessage("PDFの読み取りが完了しました。抽出候補を確認してください。");
-      setActive("基本情報");
+      const extractedCount = Object.values(extracted.basic).filter((value) => value !== undefined && value !== "").length;
+      const textLength = extracted.rawText.replace(/\s/g, "").length;
+      if (extractedCount > 0) {
+        setPdfMessage(`PDFの読み取りが完了しました。${extractedCount}件の候補値を反映しました。`);
+        setActive("基本情報");
+      } else if (textLength > 0) {
+        setPdfMessage(`OCRで文字は取得しましたが、主要項目として自動反映できた候補は0件でした。下のOCRテキストを確認し、基本情報画面で手入力してください。`);
+      } else {
+        setPdfMessage("PDFから文字を取得できませんでした。画像品質や保護設定により、手入力が必要です。");
+      }
     } catch (error) {
       console.error(error);
       setPdfStatus("error");
@@ -314,10 +322,15 @@ export function App() {
             {pdfMessage && <p className={pdfStatus === "error" ? "warning" : "notice"}>{pdfMessage}</p>}
             {project.extracted && (
               <div className="extracted">
-                <h2>抽出メモ</h2>
+                <h2>抽出結果</h2>
                 {project.extracted.notes.map((note) => (
                   <span key={note}>{note}</span>
                 ))}
+                <button onClick={() => setActive("基本情報")}>基本情報を確認する</button>
+                <details className="ocrPreview">
+                  <summary>OCR/抽出テキストを確認</summary>
+                  <textarea readOnly value={project.extracted.rawText.slice(0, 6000) || "抽出テキストはありません。"} />
+                </details>
               </div>
             )}
           </section>

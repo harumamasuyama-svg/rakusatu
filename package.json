@@ -5,6 +5,8 @@
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
+    "@tesseract.js-data/jpn": "^1.0.0",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@vitejs/plugin-react": "latest",
@@ -15,9 +17,10 @@
     "pdfjs-dist": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "tesseract.js": "^7.0.0",
+    "tesseract.js-core": "^6.1.2",
     "typescript": "latest",
     "vite": "latest",
     "xlsx": "latest"
-  },
-  "devDependencies": {}
+  }
 }
